@@ -1,83 +1,63 @@
 #!/usr/bin/python3
-"""This is the base model class for AirBnB"""
-from sqlalchemy.ext.declarative import declarative_base
+"""
+This module defines a BaseModel class that
+defines all common attributes/methods for model classes
+"""
+
 import uuid
 import models
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime
-
-
-Base = declarative_base()
 
 
 class BaseModel:
-    """This class will defines all common attributes/methods
-    for other classes
     """
-    id = Column(String(60), unique=True, nullable=False, primary_key=True)
-    created_at = Column(DateTime, nullable=False, default=(datetime.utcnow()))
-    updated_at = Column(DateTime, nullable=False, default=(datetime.utcnow()))
+    This is the base model class.
+    """
 
     def __init__(self, *args, **kwargs):
-        """Instantiation of base model class
-        Args:
-            args: it won't be used
-            kwargs: arguments for the constructor of the BaseModel
-        Attributes:
-            id: unique id generated
-            created_at: creation date
-            updated_at: updated date
+        """
+        Initialize public instance attributes.
         """
         if kwargs:
             for key, value in kwargs.items():
-                if key == "created_at" or key == "updated_at":
-                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
-                if key != "__class__":
+                if key == 'created_at' or key == 'updated_at':
+                    value = datetime.fromisoformat(value)
+                if key != '__class__':
                     setattr(self, key, value)
-            if "id" not in kwargs:
-                self.id = str(uuid.uuid4())
-            if "created_at" not in kwargs:
-                self.created_at = datetime.now()
-            if "updated_at" not in kwargs:
-                self.updated_at = datetime.now()
         else:
             self.id = str(uuid.uuid4())
-            self.created_at = self.updated_at = datetime.now()
-
-    def __str__(self):
-        """returns a string
-        Return:
-            returns a string of class name, id, and dictionary
-        """
-        return "[{}] ({}) {}".format(
-            type(self).__name__, self.id, self.__dict__)
-
-    def __repr__(self):
-        """return a string representaion
-        """
-        return self.__str__()
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
+            models.storage.new(self)
 
     def save(self):
-        """updates the public instance attribute updated_at to current
+        """
+        Updates the file storage with the new/updated information.
         """
         self.updated_at = datetime.now()
-        models.storage.new(self)
         models.storage.save()
 
     def to_dict(self):
-        """creates dictionary of the class  and returns
-        Return:
-            returns a dictionary of all the key values in __dict__
         """
-        my_dict = dict(self.__dict__)
-        my_dict["__class__"] = str(type(self).__name__)
-        my_dict["created_at"] = self.created_at.isoformat()
-        my_dict["updated_at"] = self.updated_at.isoformat()
-        if '_sa_instance_state' in my_dict.keys():
-            del my_dict['_sa_instance_state']
-        return my_dict
+        Convert the object to a dictionary representation.
 
-    def delete(self):
-        """ delete object
+        Returns:
+            dict: A dictionary representation of the object.
         """
-        models.storage.delete(self)
+
+        obj_dict = self.__dict__.copy()
+        obj_dict["__class__"] = self.__class__.__name__
+        for key, value in self.__dict__.items():
+            if key == 'created_at' or key == 'updated_at':
+                value = value.isoformat()
+            obj_dict[key] = value
+
+        return obj_dict
+
+    def __str__(self):
+        """
+        Returns a string representation of the BaseModel class.
+        """
+        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
+    
+    

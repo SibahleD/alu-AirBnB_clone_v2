@@ -1,29 +1,28 @@
 #!/usr/bin/python3
-"""User class"""
-from models.base_model import BaseModel, Base
-from sqlalchemy import String, DateTime, Column, ForeignKey
-from sqlalchemy.orm import relationship
+"""
+This module contains the User class (Blueprint for creating user objects).
+"""
+
+from models.base_model import BaseModel
 
 
-class User(BaseModel, Base):
-    """This is the class for user
-    Attributes:
-        email: email address
-        password: password for you login
-        first_name: first name
-        last_name: last name
+class User(BaseModel):
     """
-    __tablename__ = 'users'
+    This is the user class.
 
-    email = Column(String(128), nullable=False)
-    password = Column(String(128), nullable=False)
-    first_name = Column(String(128), nullable=True)
-    last_name = Column(String(128), nullable=True)
-    places = relationship(
-        'Place',
-        backref='user',
-        cascade='all, delete-orphan')
-    reviews = relationship(
-        'Review',
-        backref='user',
-        cascade='all, delete-orphan')
+    Attributes:
+        email (str): The email address of the user.
+        password (str): The password of the user.
+        first_name (str): The first name of the user.
+        last_name (str): The last name of the user.
+    """
+    email = ""
+    password = ""
+    first_name = ""
+    last_name = ""
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize public instance attributes.
+        """
+        super().__init__(*args, **kwargs)
