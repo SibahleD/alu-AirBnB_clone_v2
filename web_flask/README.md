@@ -1,1 +1,1 @@
-The web_flask project
+web_flask
