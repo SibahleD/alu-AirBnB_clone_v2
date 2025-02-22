@@ -10,13 +10,16 @@ class FileStorage:
 
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
-        if cls:
-            filtered_objects = {
-                k: v for k, v in FileStorage.__objects.items()
-                if isinstance(v, cls)
-                }
-            return filtered_objects
-        return FileStorage.__objects
+        obj_dict = FileStorage.__objects
+        if cls is not None:
+            cls_dic = {}
+            for key, obj in obj_dict.items():
+                if type(cls) is str:
+                    cls = eval(cls)
+                if (type(obj) is cls):
+                    cls_dic[key] = obj
+            return cls_dic
+        return obj_dict
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -56,15 +59,14 @@ class FileStorage:
             pass
 
     def delete(self, obj=None):
-        """Delete obj from __objects if it’s inside
-        """
-        if obj:
-            key = obj.__class__.__name__ + '.' + obj.id
-            if key in self.__objects:
-                del self.__objects[key]
-            self.save()
+        """ Deletes obj from __objects """
+        if obj is not None:
+            obj_dic = FileStorage.__objects
+            for key in obj_dic:
+                if (obj_dic[key] == obj):
+                    del obj_dic[key]
+                    break
 
     def close(self):
-        """ calls reload()
-        """
+        """Calls the reload method of FileStorage"""
         self.reload()

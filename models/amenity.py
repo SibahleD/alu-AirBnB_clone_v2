@@ -1,19 +1,15 @@
 #!/usr/bin/python3
-"""
-This module contains Amenity class (Blueprint for creating Amenity objects).
-"""
+""" State Module for HBNB project """
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
+from models.place import association_table
 
-from models.base_model import BaseModel
 
-
-class Amenity(BaseModel):
-    """
-    This is the amenity class
-
-    Attributes:
-        name (str): The name of the amenity
-    """
-    name = ""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class Amenity(BaseModel, Base):
+    """Amenity model of hbnb project"""
+    __tablename__ = "amenities"
+    name = Column(String(128), nullable=False)
+    place_amenities = relationship(
+        "Place",
+        secondary=association_table,)
